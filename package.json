@@ -1,0 +1,27 @@
+{
+  "name": "astro-manifest-bot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "db:push": "drizzle-kit push"
+  },
+  "dependencies": {
+    "discord.js": "^14.19.3",
+    "drizzle-orm": "^0.43.1",
+    "node-cron": "^4.2.1",
+    "openai": "^4.100.0",
+    "pg": "^8.14.1",
+    "pino": "^9.14.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.18",
+    "@types/pg": "^8.11.13",
+    "drizzle-kit": "^0.31.1",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}
