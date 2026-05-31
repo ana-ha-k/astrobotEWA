@@ -393,7 +393,14 @@ export class AstrologyBot {
         )
         .setFooter({ text: `Longest streak: ${longestStreak} days` });
 
-      await interaction.editReply({ embeds: [embed] });
+      // Send ephemeral confirmation to user
+      await interaction.editReply({ content: "✅ Checked in!" });
+
+      // Post public announcement to the channel
+      const channel = interaction.channel;
+      if (channel && channel instanceof TextChannel) {
+        await channel.send({ embeds: [embed] });
+      }
     } catch (err) {
       logger.error({ err }, "Error handling /checkin");
       await interaction.editReply("Something went wrong. Try again in a moment. 🌙");
