@@ -343,10 +343,45 @@ export class AstrologyBot {
             : `💬 Today's messages: **${msgCount}** ✅`);
       }
 
+      const CHECKIN_MESSAGES = [
+        "We are so proud of you for showing up today. The universe noticed. 🌙",
+        "You did the work. That's not small — that's everything. ✨",
+        "Look at you, choosing yourself again. We see you and we love it. 💜",
+        "Another day, another deposit into your abundance account. 🌟",
+        "This is what manifestation actually looks like — you, showing up. 🔥",
+        "The version of you who has everything? She checks in every day. Keep going. 🪐",
+        "You are literally rewriting your reality one check-in at a time. 💫",
+        "So proud of you. The cosmos is conspiring harder for you because of this. ✨",
+        "This is your sign that it's working. Keep going, beautiful soul. 🌸",
+        "You showed up when you didn't have to. That's the whole game. 💎",
+        "The discipline you're building right now? That's the real abundance. 🌙",
+        "We're obsessed with your commitment. The universe is too. 🔮",
+        "You just activated something. We can feel it from here. ⚡",
+        "Showing up consistently is a form of self-love and you are nailing it. 💜",
+        "Today's check-in just raised your frequency. Feel that? 🌊",
+        "You are not the same person you were when you started. Keep going. 🦋",
+        "This is what aligned action looks like. So proud of you. 🌟",
+        "Your future self is sending you the biggest thank you right now. ✨",
+        "The magic is in the consistency. You are so close. Keep trusting. 🔮",
+        "We see you doing the inner work. It is never wasted. Ever. 💫",
+        "Another day of choosing growth over comfort. That's a CEO move. 👑",
+        "You turned up for yourself today. That energy multiplies. 🌙",
+        "The universe rewards those who show up. You are proof of that. ⭐",
+        "Checked in and levelling up. This is your era and it shows. 💜",
+        "Something is shifting for you. These check-ins are the proof. 🌸",
+        "You are building something real here. We are witnessing it. 🔥",
+        "Every single check-in is a declaration — I believe in my own becoming. 💎",
+        "Proud doesn't even cover it. You are showing up like a pro. ✨",
+        "The resistance you overcame to be here today? That's your power. 🌟",
+        "You are so loved, so supported, and so on track. Keep going. 🪐",
+      ];
+
+      const motivationalMessage = CHECKIN_MESSAGES[(streak - 1) % CHECKIN_MESSAGES.length];
+
       const embed = new EmbedBuilder()
         .setColor(unlocked ? 0xffd700 : revoked ? 0xff4444 : 0x9b59b6)
         .setTitle(`✅ Day ${streak} — Checked in!`)
-        .setDescription(description)
+        .setDescription(description + `\n\n*${motivationalMessage}*`)
         .setFooter({ text: `Longest streak: ${longestStreak} days` });
 
       await interaction.editReply({ embeds: [embed] });
