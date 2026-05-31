@@ -261,7 +261,7 @@ export class AstrologyBot {
   // ── /checkin ─────────────────────────────────────────────────────────────
 
   private async handleCheckin(interaction: import("discord.js").ChatInputCommandInteraction) {
-    if (!await this.safeDefer(interaction, true)) return;
+    if (!await this.safeDefer(interaction, false)) return;
 
     const userId  = interaction.user.id;
     const guildId = interaction.guildId;
@@ -273,6 +273,23 @@ export class AstrologyBot {
 
     try {
       const msgCount = await getMessageCount(userId, guildId);
+
+      // Block check-in if they haven't sent enough messages today
+      if (msgCount < DAILY_MSG_MINIMUM) {
+        const needed = DAILY_MSG_MINIMUM - msgCount;
+        const embed = new EmbedBuilder()
+          .setColor(0xff9500)
+          .setTitle("💬 Not so fast!")
+          .setDescription(
+            `You need to **interact with the community first** before checking in.\n\n` +
+            `Send **${needed} more message${needed === 1 ? "" : "s"}** in the server today *(6+ words each)* then come back to check in.\n\n` +
+            `Today's messages: **${msgCount}/${DAILY_MSG_MINIMUM}**\n\n` +
+            `*Real participation, real results. Go connect with your people! 🌙*`
+          );
+        await interaction.editReply({ embeds: [embed] });
+        return;
+      }
+
       const result   = await recordCheckIn(userId, guildId);
 
       if (result.status === "already_checked_in") {
@@ -343,45 +360,37 @@ export class AstrologyBot {
             : `💬 Today's messages: **${msgCount}** ✅`);
       }
 
-      const CHECKIN_MESSAGES = [
-        "We are so proud of you for showing up today. The universe noticed. 🌙",
-        "You did the work. That's not small — that's everything. ✨",
-        "Look at you, choosing yourself again. We see you and we love it. 💜",
-        "Another day, another deposit into your abundance account. 🌟",
-        "This is what manifestation actually looks like — you, showing up. 🔥",
-        "The version of you who has everything? She checks in every day. Keep going. 🪐",
-        "You are literally rewriting your reality one check-in at a time. 💫",
-        "So proud of you. The cosmos is conspiring harder for you because of this. ✨",
-        "This is your sign that it's working. Keep going, beautiful soul. 🌸",
-        "You showed up when you didn't have to. That's the whole game. 💎",
-        "The discipline you're building right now? That's the real abundance. 🌙",
-        "We're obsessed with your commitment. The universe is too. 🔮",
-        "You just activated something. We can feel it from here. ⚡",
-        "Showing up consistently is a form of self-love and you are nailing it. 💜",
-        "Today's check-in just raised your frequency. Feel that? 🌊",
-        "You are not the same person you were when you started. Keep going. 🦋",
-        "This is what aligned action looks like. So proud of you. 🌟",
-        "Your future self is sending you the biggest thank you right now. ✨",
-        "The magic is in the consistency. You are so close. Keep trusting. 🔮",
-        "We see you doing the inner work. It is never wasted. Ever. 💫",
-        "Another day of choosing growth over comfort. That's a CEO move. 👑",
-        "You turned up for yourself today. That energy multiplies. 🌙",
-        "The universe rewards those who show up. You are proof of that. ⭐",
-        "Checked in and levelling up. This is your era and it shows. 💜",
-        "Something is shifting for you. These check-ins are the proof. 🌸",
-        "You are building something real here. We are witnessing it. 🔥",
-        "Every single check-in is a declaration — I believe in my own becoming. 💎",
-        "Proud doesn't even cover it. You are showing up like a pro. ✨",
-        "The resistance you overcame to be here today? That's your power. 🌟",
-        "You are so loved, so supported, and so on track. Keep going. 🪐",
+      const PUBLIC_ANNOUNCEMENTS = [
+        "showed up. Again. 💪",
+        "kept their promise to themselves today 🔥",
+        "is proof that consistency wins 🔥",
+        "chose themselves today. Non-negotiable. ✨",
+        "did the work. The universe noticed. 🌙",
+        "showing up like the main character she is 👑",
+        "is literally rewriting her reality 💫",
+        "building her streak one day at a time 🌟",
+        "is not playing around this season 🔥",
+        "turned up for herself today. That's the whole game. 💎",
+        "activated something today. We felt it. ⚡",
+        "is proof that aligned action works 🌸",
+        "raised her frequency today. Feel that? 🌊",
+        "is not the same person she was when she started 🦋",
+        "chose growth over comfort today. CEO behaviour. 👑",
       ];
 
-      const motivationalMessage = CHECKIN_MESSAGES[(streak - 1) % CHECKIN_MESSAGES.length];
+      const announcement = PUBLIC_ANNOUNCEMENTS[(streak - 1) % PUBLIC_ANNOUNCEMENTS.length];
+      const daysLeft = Math.max(0, STREAK_UNLOCK_DAYS - streak);
 
       const embed = new EmbedBuilder()
         .setColor(unlocked ? 0xffd700 : revoked ? 0xff4444 : 0x9b59b6)
-        .setTitle(`✅ Day ${streak} — Checked in!`)
-        .setDescription(description + `\n\n*${motivationalMessage}*`)
+        .setTitle(`<@${userId}> ${announcement}`)
+        .setDescription(
+          unlocked
+            ? `🌟 **Inner circle unlocked!** Access to **#⚛️┃aligned-abundance** granted.`
+            : revoked
+            ? `💔 Access revoked. Build back to unlock again. 🌱`
+            : `**Day ${streak}** · ${daysLeft > 0 ? `${daysLeft} day${daysLeft === 1 ? "" : "s"} to unlock #aligned-abundance` : `You're in the inner circle! Keep protecting it. 🔐`}`
+        )
         .setFooter({ text: `Longest streak: ${longestStreak} days` });
 
       await interaction.editReply({ embeds: [embed] });
