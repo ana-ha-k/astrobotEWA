@@ -1,10 +1,13 @@
 import OpenAI from "openai";
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error("OPENAI_API_KEY must be set.");
+if (!process.env.GROQ_API_KEY) {
+  throw new Error("GROQ_API_KEY must be set.");
 }
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: "https://api.groq.com/openai/v1",
+});
 
 export const NAKSHATRAS = [
   "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
@@ -57,7 +60,7 @@ Respond ONLY with valid JSON — no markdown, no extra text:
 }`;
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: "llama-3.3-70b-versatile",
     max_tokens: 4000,
     messages: [{ role: "user", content: prompt }],
   });
@@ -79,7 +82,7 @@ export interface OracleCard {
 export async function generateOracleCard(): Promise<OracleCard> {
   const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
   const response = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: "llama-3.3-70b-versatile",
     max_tokens: 400,
     messages: [{
       role: "user",
@@ -105,7 +108,7 @@ Respond ONLY with valid JSON, no markdown:
 export async function generateManifestationPrompt(): Promise<string> {
   const weekNumber = Math.ceil((Date.now() - new Date(new Date().getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
   const response = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: "llama-3.3-70b-versatile",
     max_tokens: 400,
     messages: [{
       role: "user",
