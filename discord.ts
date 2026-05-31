@@ -205,6 +205,16 @@ export class AstrologyBot {
         .setName("removereminder")
         .setDescription("Remove your daily practice reminder")
         .toJSON(),
+
+      new SlashCommandBuilder()
+        .setName("oracle")
+        .setDescription("Pull today's oracle card 🔮")
+        .toJSON(),
+
+      new SlashCommandBuilder()
+        .setName("thisweek")
+        .setDescription("Get this week's manifestation prompt 🕯️")
+        .toJSON(),
     ];
 
     const rest = new REST().setToken(this.token);
@@ -232,6 +242,8 @@ export class AstrologyBot {
     if (commandName === "leaderboard")    return this.handleLeaderboard(interaction);
     if (commandName === "setreminder")    return this.handleSetReminder(interaction);
     if (commandName === "removereminder") return this.handleRemoveReminder(interaction);
+    if (commandName === "oracle")         return this.handleOracleCommand(interaction);
+    if (commandName === "thisweek")       return this.handleThisWeekCommand(interaction);
   }
 
   // ── /cosmos ──────────────────────────────────────────────────────────────
@@ -539,6 +551,47 @@ export class AstrologyBot {
     } catch (err) {
       logger.error({ err }, "Error removing reminder");
       await interaction.editReply("Could not remove your reminder. Try again. 🌙");
+    }
+  }
+
+  // ── /oracle ──────────────────────────────────────────────────────────────
+
+  private async handleOracleCommand(interaction: import("discord.js").ChatInputCommandInteraction) {
+    if (!await this.safeDefer(interaction)) return;
+    try {
+      const card  = await generateOracleCard();
+      const weekOf = new Date().toLocaleDateString("en-US", {
+        month: "long", day: "numeric", year: "numeric",
+      });
+      const embed = new EmbedBuilder()
+        .setColor(0x4b0082)
+        .setTitle(`🌙 Oracle Card — ${card.name}`)
+        .setDescription(card.message)
+        .addFields(
+          { name: "✦ Theme",       value: card.theme,              inline: true  },
+          { name: "✦ Guidance",    value: card.guidance,           inline: false },
+          { name: "✦ Affirmation", value: `*${card.affirmation}*`, inline: false },
+        )
+        .setFooter({ text: `${weekOf} • Cosmic Creator's 🔮` });
+      await interaction.editReply({ embeds: [embed] });
+    } catch (err) {
+      logger.error({ err }, "Error handling /oracle");
+      await interaction.editReply("The oracle is resting. Try again in a moment. 🌙");
+    }
+  }
+
+  // ── /thisweek ─────────────────────────────────────────────────────────────
+
+  private async handleThisWeekCommand(interaction: import("discord.js").ChatInputCommandInteraction) {
+    if (!await this.safeDefer(interaction)) return;
+    try {
+      const prompt = await generateManifestationPrompt();
+      await interaction.editReply(`🕯️ **This Week I Will...**
+
+${prompt}`);
+    } catch (err) {
+      logger.error({ err }, "Error handling /thisweek");
+      await interaction.editReply("The manifestation portal is loading. Try again in a moment. 🌙");
     }
   }
 
