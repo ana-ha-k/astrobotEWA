@@ -11,7 +11,7 @@ import {
   type Guild,
 } from "discord.js";
 import { logger } from "./logger.js";
-import { generateDailyForecast, generateManifestationPrompt, generateOracleCard, NAKSHATRAS, type Nakshatra } from "./astrology.js";
+import { generateDailyForecast, generateManifestationPrompt, generateOracleCard, generateAbundanceTeaching, NAKSHATRAS, type Nakshatra } from "./astrology.js";
 import {
   recordCheckIn,
   getStreak,
@@ -33,6 +33,8 @@ import {
 } from "./checkin.js";
 import { db, userStreaks } from "./db.js";
 import { eq } from "drizzle-orm";
+
+const TEACHINGS_CHANNEL_ID = process.env["TEACHINGS_CHANNEL_ID"] ?? "1511686083132391474";
 
 const ORACLE_CHANNEL_ID          = "1508188932364435608"; // #🌙┃oracle-of-the-week
 
@@ -868,6 +870,25 @@ ${prompt}`);
 
   async login() {
     await this.client.login(this.token);
+  }
+
+  async postAbundanceTeaching() {
+    try {
+      const teaching = await generateAbundanceTeaching();
+      const channel  = await this.client.channels.fetch(TEACHINGS_CHANNEL_ID);
+      if (!channel || !(channel instanceof TextChannel)) {
+        logger.warn("Teachings channel not found");
+        return;
+      }
+      const embed = new EmbedBuilder()
+        .setColor(0x9b59b6)
+        .setDescription(teaching)
+        .setFooter({ text: "Cosmic Creator's • Daily Abundance Teaching 🧠" });
+      await channel.send({ embeds: [embed] });
+      logger.info("Posted abundance teaching");
+    } catch (err) {
+      logger.error({ err }, "Failed to post abundance teaching");
+    }
   }
 
   async postDailyPrediction(): Promise<void> {
