@@ -51,6 +51,12 @@ export function startScheduler(bot: AstrologyBot) {
     await bot.runDailyMissProcessing();
   });
 
+  // ── Daily abundance teaching at 09:30 UTC (3 PM IST) ─────────────────────
+  cron.schedule("30 9 * * *", async () => {
+    logger.info("Cron: daily abundance teaching");
+    await bot.postAbundanceTeaching();
+  });
+
   // ── Per-minute reminder job ─────────────────────────────────────────────
   // Sends DMs to users whose reminderTime matches current UTC HH:MM
   cron.schedule("* * * * *", async () => {
