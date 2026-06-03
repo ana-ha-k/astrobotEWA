@@ -105,6 +105,49 @@ Respond ONLY with valid JSON, no markdown:
   }
 }
 
+export async function generateAbundanceTeaching(): Promise<string> {
+  const topics = [
+    "nervous system regulation and how it blocks manifestation",
+    "the theta brainwave state and subconscious reprogramming",
+    "cortisol patterns and how stress keeps abundance away",
+    "HRV (heart rate variability) and its connection to manifestation",
+    "neuroplasticity and rewiring the brain for abundance",
+    "the vagus nerve and its role in feeling safe to receive",
+    "somatic healing and releasing stored scarcity from the body",
+    "Kriya Yoga and its effect on the nervous system",
+    "identity shifting and becoming the person who has it all",
+    "the subconscious mind and why affirmations alone don't work",
+    "co-regulation and how your environment shapes your frequency",
+    "the reticular activating system and why you see what you believe",
+    "dopamine, motivation, and building momentum in manifestation",
+    "oxytocin and the role of safety in receiving love and money",
+    "window of tolerance and expanding your capacity for abundance",
+  ];
+  const topic = topics[Math.floor(Math.random() * topics.length)];
+  const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+
+  const response = await openai.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    max_tokens: 500,
+    messages: [{
+      role: "user",
+      content: `You are writing for "Cosmic Creator's", a spiritual manifestation community that bridges neuroscience, Kriya Yoga, and abundance. Today is ${today}.
+
+Write a short, punchy abundance teaching about: ${topic}
+
+Format:
+- Start with one bold insight (1 sentence, no fluff)
+- 2-3 sentences of neuroscience/spiritual explanation in simple language
+- One practical thing they can do TODAY
+- End with one high-frequency affirmation in italics
+
+Keep it under 150 words. No hashtags. Speak directly to the reader as "you". Tone: confident, warm, knowledgeable — like a mentor who has been where they are.`,
+    }],
+  });
+  return response.choices[0]?.message?.content?.trim() ?? 
+    "**Your nervous system is the gateway to abundance.**\n\nWhen you are in a state of chronic stress, your brain literally cannot perceive opportunities. Cortisol narrows your focus to survival not creation.\n\nToday: Take 5 slow exhales to activate your parasympathetic nervous system before you work on your goals.\n\n*I am safe to receive. My nervous system is regulated. Abundance flows through me now.*";
+}
+
 export async function generateManifestationPrompt(): Promise<string> {
   const weekNumber = Math.ceil((Date.now() - new Date(new Date().getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
   const response = await openai.chat.completions.create({
