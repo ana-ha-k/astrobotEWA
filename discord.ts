@@ -217,6 +217,12 @@ export class AstrologyBot {
         .setName("thisweek")
         .setDescription("Get this week's manifestation prompt 🕯️")
         .toJSON(),
+
+      new SlashCommandBuilder()
+        .setName("teaching")
+        .setDescription("Post today's abundance teaching (admin only) 🧠")
+        .setDefaultMemberPermissions("0")
+        .toJSON(),
     ];
 
     const rest = new REST().setToken(this.token);
@@ -245,6 +251,7 @@ export class AstrologyBot {
     if (commandName === "setreminder")    return this.handleSetReminder(interaction);
     if (commandName === "removereminder") return this.handleRemoveReminder(interaction);
     if (commandName === "oracle")         return this.handleOracleCommand(interaction);
+    if (commandName === "teaching")       return this.handleTeachingCommand(interaction);
     if (commandName === "thisweek")       return this.handleThisWeekCommand(interaction);
   }
 
@@ -553,6 +560,19 @@ export class AstrologyBot {
     } catch (err) {
       logger.error({ err }, "Error removing reminder");
       await interaction.editReply("Could not remove your reminder. Try again. 🌙");
+    }
+  }
+
+  // ── /teaching (admin only) ───────────────────────────────────────────────
+
+  private async handleTeachingCommand(interaction: import("discord.js").ChatInputCommandInteraction) {
+    if (!await this.safeDefer(interaction, true)) return;
+    try {
+      await this.postAbundanceTeaching();
+      await interaction.editReply("✅ Abundance teaching posted!");
+    } catch (err) {
+      logger.error({ err }, "Error handling /teaching");
+      await interaction.editReply("Something went wrong. Try again. 🌙");
     }
   }
 
